@@ -142,8 +142,8 @@ vim.opt.splitbelow = true
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
 --  and `:help 'listchars'`
-vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+--vim.opt.list = true
+--vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -337,7 +337,11 @@ require('lazy').setup({
 
       'nvim-telescope/telescope.nvim',
     },
-    config = true,
+    config = function()
+      local neogit = require 'neogit'
+      neogit.setup()
+      vim.keymap.set('n', '<leader>gs', neogit.open, { silent = true, noremap = true })
+    end,
   },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
