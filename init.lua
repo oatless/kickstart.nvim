@@ -328,6 +328,18 @@ require('lazy').setup({
     end,
   },
 
+  --Neogit
+  {
+    'NeogitOrg/neogit',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'sindrets/diffview.nvim',
+
+      'nvim-telescope/telescope.nvim',
+    },
+    config = true,
+  },
+
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
