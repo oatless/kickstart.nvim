@@ -165,7 +165,7 @@ vim.opt.hlsearch = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Set "kj" to Esc
-local options = { noremap = true }
+local options = { noremap = true, silent = true}
 vim.keymap.set('i', 'kj', '<Esc>', options)
 
 -- Diagnostic keymaps
@@ -196,6 +196,23 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+
+-- Keybinds for resizing windows
+vim.keymap.set('n', '<C-Up>', ":resize +2<CR>", options)
+vim.keymap.set('n', '<C-Down>', ":resize -2<CR>", options)
+vim.keymap.set('n', '<C-Left>', ":vertical resize -2<CR>", options)
+vim.keymap.set('n', '<C-Right>', ":vertical resize +2<CR>", options)
+
+-- Stay in indent mode
+vim.keymap.set('v', "<", "<gv", options)
+vim.keymap.set('v', ">", ">gv", options)
+
+-- Move text up and down
+vim.keymap.set('v', '<A-Up>', ":m .+1<CR>==", options)
+vim.keymap.set('v', '<A-Down>', ":m .-1<CR>==", options)
+
+-- Visual Mode Pasting Fix
+vim.keymap.set('v', 'p', '"_dP', options)
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -863,15 +880,18 @@ require('lazy').setup({
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     --'folke/tokyonight.nvim',
-    --'rebelot/kanagawa.nvim',
-    'zootedb0t/citruszest.nvim',
+    'rebelot/kanagawa.nvim',
+    --'zootedb0t/citruszest.nvim',
+    --'jacoborus/tender.vim',
+    --'catppuccin/nvim',
+
     lazy = false,
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'citruszest'
+      vim.cmd.colorscheme 'kanagawa-wave'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
