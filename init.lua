@@ -323,7 +323,7 @@ require('lazy').setup({
     end
   },
 
-  --Neo tree
+  --Neo-tree
   {
     'nvim-neo-tree/neo-tree.nvim',
     version = '*',
@@ -333,7 +333,8 @@ require('lazy').setup({
       'MunifTanjim/nui.nvim',
     },
     config = function()
-      require('neo-tree').setup {}
+      require('neo-tree').setup{}
+      vim.keymap.set('n', '<leader>fe', ':Neotree toggle<CR>', {noremap = true, silent = true})
     end,
   },
 
