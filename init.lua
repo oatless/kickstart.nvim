@@ -108,7 +108,7 @@ vim.o.shiftwidth = 4
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -373,12 +373,15 @@ require('lazy').setup({
       vim.keymap.set('n', '<A-l>', function()
         harpoon:list():select(3)
       end)
+      vim.keymap.set('n', '<A-;>', function()
+        harpoon:list():select(4)
+      end)
 
       -- Toggle previous & next buffers stored within Harpoon list
-      vim.keymap.set('n', '<S-A-k>', function()
+      vim.keymap.set('n', '<C-A-k>', function()
         harpoon:list():prev()
       end)
-      vim.keymap.set('n', '<S-A-j>', function()
+      vim.keymap.set('n', '<C-A-j>', function()
         harpoon:list():next()
       end)
     end,
@@ -395,7 +398,7 @@ require('lazy').setup({
     },
     config = function()
       local neogit = require 'neogit'
-      neogit.setup()
+      neogit.setup {}
       vim.keymap.set('n', '<leader>gs', neogit.open, { silent = true, noremap = true })
     end,
   },
@@ -951,7 +954,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'glsl' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -968,6 +971,8 @@ require('lazy').setup({
 
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup(opts)
+
+      vim.treesitter.language.register('glsl', {'vert', 'geom', 'frag'})
 
       -- There are additional nvim-treesitter modules that you can use to interact
       -- with nvim-treesitter. You should go explore a few and see what interests you:
@@ -1021,6 +1026,15 @@ require('lazy').setup({
   },
 })
 
+vim.filetype.add({
+  extension = {
+    vert = "glsl",
+    geom = "glsl",
+    frag = "glsl",
+  }
+})
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
 
