@@ -174,6 +174,9 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 local options = { noremap = true, silent = true}
 vim.keymap.set('i', 'kj', '<Esc>', options)
 
+-- Set " qq" to close window
+vim.keymap.set('n', '<leader>qq', ':q<CR>', options)
+
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
@@ -396,11 +399,7 @@ require('lazy').setup({
 
       'nvim-telescope/telescope.nvim',
     },
-    config = function()
-      local neogit = require 'neogit'
-      neogit.setup {}
-      vim.keymap.set('n', '<leader>gs', neogit.open, { silent = true, noremap = true })
-    end,
+    config = true
   },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
@@ -780,6 +779,20 @@ require('lazy').setup({
   --  },
   --},
 
+  { --Autopairs
+    'windwp/nvim-autopairs',
+    event = 'InsertEnter',
+    -- Optional dependency
+    dependencies = { 'hrsh7th/nvim-cmp' },
+    config = function()
+      require('nvim-autopairs').setup {}
+      -- If you want to automatically add `(` after selecting a function or method
+      local cmp_autopairs = require 'nvim-autopairs.completion.cmp'
+      local cmp = require 'cmp'
+      cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
+    end,
+  },
+
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
@@ -965,14 +978,38 @@ require('lazy').setup({
         additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
+      textobjects = {
+        select = {
+          enable = true,
+          lookahead = true,
+          keymaps = {
+            ['af'] = '@function.outer',
+            ['if'] = '@function.inner',
+          }
+        },
+        move = {
+          enable = true,
+          set_jumps = true,
+          goto_next_start = {
+            [']f'] = '@function.outer',
+          },
+          goto_next_end = {
+            [']F'] = '@function.outer',
+          },
+          goto_previous_start = {
+            ['[f'] = '@function.outer',
+          },
+          goto_previous_end = {
+            ['[F'] = '@function.outer',
+          },
+        }
+      }
     },
     config = function(_, opts)
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
 
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup(opts)
-
-      vim.treesitter.language.register('glsl', {'vert', 'geom', 'frag'})
 
       -- There are additional nvim-treesitter modules that you can use to interact
       -- with nvim-treesitter. You should go explore a few and see what interests you:
@@ -1033,6 +1070,9 @@ vim.filetype.add({
     frag = "glsl",
   }
 })
+
+-- Neogit keymap
+--vim.keymap.set('n', '<leader>gs', neogit.open, { silent = true, noremap = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
