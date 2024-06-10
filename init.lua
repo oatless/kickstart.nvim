@@ -399,7 +399,11 @@ require('lazy').setup({
 
       'nvim-telescope/telescope.nvim',
     },
-    config = true
+    config = function()
+      local neogit = require 'neogit'
+      neogit.setup {}
+      vim.keymap.set('n', '<leader>gs', neogit.open, { silent = true, noremap = true })
+    end,
   },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
@@ -1071,9 +1075,6 @@ vim.filetype.add({
     frag = "glsl",
   }
 })
-
--- Neogit keymap
---vim.keymap.set('n', '<leader>gs', neogit.open, { silent = true, noremap = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
