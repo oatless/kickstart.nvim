@@ -300,7 +300,7 @@ require('lazy').setup({
             else
               gitsigns.nav_hunk('next')
             end
-          end)
+          end, {desc = 'Next Hunk'})
 
           map('n', '[c', function()
             if vim.wo.diff then
@@ -308,16 +308,16 @@ require('lazy').setup({
             else
               gitsigns.nav_hunk('prev')
             end
-          end)
+          end, {desc = 'Previous Hunk'})
 
           -- Actions
-          map('n', '<leader>hs', gitsigns.stage_hunk)
-          map('n', '<leader>hr', gitsigns.reset_hunk)
+          map('n', '<leader>hs', gitsigns.stage_hunk, {desc = '[H]unk [S]tage'})
+          map('n', '<leader>hr', gitsigns.reset_hunk, {desc = '[H]unk [R]eset'})
           map('v', '<leader>hs', function() gitsigns.stage_hunk {vim.fn.line('.'), vim.fn.line('v')} end)
           map('v', '<leader>hr', function() gitsigns.reset_hunk {vim.fn.line('.'), vim.fn.line('v')} end)
-          map('n', '<leader>hu', gitsigns.undo_stage_hunk)
-          map('n', '<leader>hp', gitsigns.preview_hunk)
-          map('n', '<leader>hd', gitsigns.diffthis)
+          map('n', '<leader>hu', gitsigns.undo_stage_hunk, {desc = '[H]unk Stage [U]ndo'})
+          map('n', '<leader>hp', gitsigns.preview_hunk, {desc = '[H]unk [P]review'})
+          map('n', '<leader>hd', gitsigns.diffthis, {desc = '[H]unk [D]iff This'})
 
           -- Text object
           map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
@@ -337,7 +337,7 @@ require('lazy').setup({
     },
     config = function()
       require('neo-tree').setup{}
-      vim.keymap.set('n', '<leader>fe', ':Neotree toggle<CR>', {noremap = true, silent = true})
+      vim.keymap.set('n', '<leader>fe', ':Neotree toggle<CR>', {noremap = true, silent = true, desc = '[F]ile [E]xplorer'})
     end,
   },
 
@@ -362,31 +362,31 @@ require('lazy').setup({
 
       vim.keymap.set('n', '<leader>a', function()
         harpoon:list():add()
-      end)
+      end, {desc = 'Add to harpoon'})
       vim.keymap.set('n', '<C-e>', function()
         harpoon.ui:toggle_quick_menu(harpoon:list())
-      end)
+      end, {desc = 'Toggle quick menu'})
 
       vim.keymap.set('n', '<A-j>', function()
         harpoon:list():select(1)
-      end)
+      end, {desc = 'Go to Harpoon 1'})
       vim.keymap.set('n', '<A-k>', function()
         harpoon:list():select(2)
-      end)
+      end, {desc = 'Go to Harpoon 2'})
       vim.keymap.set('n', '<A-l>', function()
         harpoon:list():select(3)
-      end)
+      end, {desc = 'Go to Harpoon 3'})
       vim.keymap.set('n', '<A-;>', function()
         harpoon:list():select(4)
-      end)
+      end, {desc = 'Go to Harpoon 4'})
 
       -- Toggle previous & next buffers stored within Harpoon list
       vim.keymap.set('n', '<C-A-k>', function()
         harpoon:list():prev()
-      end)
+      end, {desc = 'Scroll Harpoon Up'})
       vim.keymap.set('n', '<C-A-j>', function()
         harpoon:list():next()
-      end)
+      end, {desc = 'Scroll Harpoon Down'})
     end,
   },
 
@@ -402,7 +402,7 @@ require('lazy').setup({
     config = function()
       local neogit = require 'neogit'
       neogit.setup {}
-      vim.keymap.set('n', '<leader>gs', neogit.open, { silent = true, noremap = true })
+      vim.keymap.set('n', '<leader>gs', neogit.open, { silent = true, noremap = true, desc = '[G]it [S]tatus'})
     end,
   },
 
