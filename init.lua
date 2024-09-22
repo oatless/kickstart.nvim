@@ -406,6 +406,15 @@ require('lazy').setup({
     end,
   },
 
+  -- Live Server
+  {
+   'barrett-ruth/live-server.nvim',
+    config = function()
+      local liveserver = require 'live-server'
+      liveserver.setup()
+    end,
+  },
+
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
@@ -427,14 +436,13 @@ require('lazy').setup({
     config = function() -- This is the function that runs, AFTER loading
       require('which-key').setup()
 
-      -- Document existing key chains
-      require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-      }
+       -- Document existing key chains
+      require('which-key').add {
+        { '<leader>c', group = '[C]ode' },
+        { '<leader>d', group = '[D]ocument' },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>w', group = '[W]orkspace' },}
     end,
   },
 
@@ -690,13 +698,17 @@ require('lazy').setup({
         -- gopls = {},
         pyright = {},
         rust_analyzer = {},
+        wgsl_analyzer = {},
+
+        csharp_ls = {},
+
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        -- tsserver = {},
+        --tsserver = {},
         --
 
         lua_ls = {
@@ -745,43 +757,6 @@ require('lazy').setup({
       }
     end,
   },
-
-  --{ -- Autoformat
-  --  'stevearc/conform.nvim',
-  --  lazy = false,
-  --  keys = {
-  --    {
-  --      '<leader>f',
-  --      function()
-  --        require('conform').format { async = true, lsp_fallback = true }
-  --      end,
-  --      mode = '',
-  --      desc = '[F]ormat buffer',
-  --    },
-  --  },
-  --  opts = {
-  --    notify_on_error = false,
-  --    format_on_save = function(bufnr)
-  --      -- Disable "format_on_save lsp_fallback" for languages that don't
-  --      -- have a well standardized coding style. You can add additional
-  --      -- languages here or re-enable it for the disabled ones.
-  --      local disable_filetypes = { c = true, cpp = true, lua = true,  }
-  --      return {
-  --        timeout_ms = 500,
-  --        lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-  --      }
-  --    end,
-  --    formatters_by_ft = {
-  --      lua = { 'stylua' },
-  --      -- Conform can also run multiple formatters sequentially
-  --      -- python = { "isort", "black" },
-  --      --
-  --      -- You can use a sub-list to tell conform to run *until* a formatter
-  --      -- is found.
-  --      -- javascript = { { "prettierd", "prettier" } },
-  --    },
-  --  },
-  --},
 
   { --Autopairs
     'windwp/nvim-autopairs',
@@ -907,11 +882,7 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    --'folke/tokyonight.nvim',
     'rebelot/kanagawa.nvim',
-    --'zootedb0t/citruszest.nvim',
-    --'jacoborus/tender.vim',
-    --'catppuccin/nvim',
 
     lazy = false,
     priority = 1000, -- Make sure to load this before all the other start plugins.
