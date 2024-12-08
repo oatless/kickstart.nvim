@@ -243,9 +243,12 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazypath) then
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
-  vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
+  local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
+  if vim.v.shell_error ~= 0 then
+    error('Error cloning lazy.nvim:\n' .. out)
+  end
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
@@ -343,14 +346,10 @@ require('lazy').setup({
     end,
   },
 
-  --Markdown preview
+  --Tmux Navigator
   {
-    'iamcco/markdown-preview.nvim',
-    cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
-    ft = { 'markdown' },
-    build = function()
-      vim.fn['mkdp#util#install']()
-    end,
+    "christoomey/vim-tmux-navigator",
+    lazy = false,
   },
 
   --Harpoon
@@ -432,22 +431,59 @@ require('lazy').setup({
   -- after the plugin has been loaded:
   --  config = function() ... end
 
-  { -- Useful plugin to show you pending keybinds.
+{ -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
-    config = function() -- This is the function that runs, AFTER loading
-      require('which-key').setup()
+    opts = {
+      icons = {
+        -- set icon mappings to true if you have a Nerd Font
+        mappings = vim.g.have_nerd_font,
+        -- If you are using a Nerd Font: set icons.keys to an empty table which will use the
+        -- default which-key.nvim defined Nerd Font icons, otherwise define a string table
+        keys = vim.g.have_nerd_font and {} or {
+          Up = '<Up> ',
+          Down = '<Down> ',
+          Left = '<Left> ',
+          Right = '<Right> ',
+          C = '<C-…> ',
+          M = '<M-…> ',
+          D = '<D-…> ',
+          S = '<S-…> ',
+          CR = '<CR> ',
+          Esc = '<Esc> ',
+          ScrollWheelDown = '<ScrollWheelDown> ',
+          ScrollWheelUp = '<ScrollWheelUp> ',
+          NL = '<NL> ',
+          BS = '<BS> ',
+          Space = '<Space> ',
+          Tab = '<Tab> ',
+          F1 = '<F1>',
+          F2 = '<F2>',
+          F3 = '<F3>',
+          F4 = '<F4>',
+          F5 = '<F5>',
+          F6 = '<F6>',
+          F7 = '<F7>',
+          F8 = '<F8>',
+          F9 = '<F9>',
+          F10 = '<F10>',
+          F11 = '<F11>',
+          F12 = '<F12>',
+        },
+      },
 
-       -- Document existing key chains
-      require('which-key').add {
-        { '<leader>c', group = '[C]ode' },
+      -- Document existing key chains
+      spec = {
+        { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
         { '<leader>d', group = '[D]ocument' },
         { '<leader>r', group = '[R]ename' },
         { '<leader>s', group = '[S]earch' },
-        { '<leader>w', group = '[W]orkspace' },}
-    end,
+        { '<leader>w', group = '[W]orkspace' },
+        { '<leader>t', group = '[T]oggle' },
+        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+      },
+    },
   },
-
   -- NOTE: Plugins can specify dependencies.
   --
   -- The dependencies are proper plugin specifications as well - anything
@@ -561,10 +597,24 @@ require('lazy').setup({
   },
 
   { -- LSP Configuration & Plugins
+    -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
+    -- used for completion, annotations and signatures of Neovim apis
+    'folke/lazydev.nvim',
+    ft = 'lua',
+    opts = {
+      library = {
+        -- Load luvit types when the `vim.uv` word is found
+        { path = 'luvit-meta/library', words = { 'vim%.uv' } },
+      },
+    },
+  },
+  { 'Bilal2453/luvit-meta', lazy = true },
+  {
+    -- Main Lsp Config
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
-      'williamboman/mason.nvim',
+      { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants-
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
@@ -572,9 +622,8 @@ require('lazy').setup({
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
       { 'j-hui/fidget.nvim', opts = {} },
 
-      -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
-      -- used for completion, annotations and signatures of Neovim apis
-      { 'folke/neodev.nvim', opts = {} },
+      -- Allows extra capabilities provided by nvim-cmp
+      'hrsh7th/cmp-nvim-lsp',
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -614,10 +663,10 @@ require('lazy').setup({
           --
           -- In this case, we create a function that lets us more easily define mappings specific
           -- for LSP related items. It sets the mode, buffer and description for us each time.
-          local map = function(keys, func, desc)
-            vim.keymap.set('n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+          local map = function(keys, func, desc, mode)
+            mode = mode or 'n'
+            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
-
           -- Jump to the definition of the word under your cursor.
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
@@ -649,7 +698,7 @@ require('lazy').setup({
 
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
-          map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+          map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
 
           -- Opens a popup that displays documentation about the word under your cursor
           --  See `:help K` for why this keymap.
@@ -1051,5 +1100,6 @@ vim.filetype.add({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
 
 
